@@ -81,6 +81,8 @@ if __name__ == '__main__':
 
     else:
         env = wrappers.Monitor(env, 'videos', video_callable=lambda episode_id: True, force=True)  # force overwrites previous video
+        figure_file = 'plots/' + fname + '_eval' + '.png'
+
         n_to_consider = 5
         scores = []
         for i in range(n_to_consider):
