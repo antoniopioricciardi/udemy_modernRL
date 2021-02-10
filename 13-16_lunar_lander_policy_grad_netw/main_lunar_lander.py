@@ -35,14 +35,14 @@ if __name__ == '__main__':
 
     n_games = 3000
     fname = 'REINFORCE_lunarlander_lr' + str(lr) + '_gamma' + str(gamma) + '_ngames' + str(n_games)
-    if not os.path.exists(fname):
-        os.mkdir(fname)
+    #if not os.path.exists(fname):
+    #    os.mkdir(fname)
     figure_file = 'plots/' + fname + '.png'
 
     scores = []
-    done = False
-    obs = env.reset()
     for i in range(n_games):
+        done = False
+        obs = env.reset()
         score = 0
         while not done:
             action = agent.choose_action(obs)
@@ -50,6 +50,7 @@ if __name__ == '__main__':
             agent.store_rewards(reward)
             obs = obs_
             score += reward
+        scores.append(score)
         agent.learn()
 
         if i > 0 and i % 100 == 0:

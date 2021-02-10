@@ -44,47 +44,36 @@ class Agent():
     def learn(self):
         self.policy.optimizer.zero_grad()
 
-        # loss = 0
+        # loss = []
         # # compute return
         # # G_t = R_t+1 + gamma*R_t+2 + gamma**2*R_t+3 ...
         # for idx, _ in enumerate(self.reward_memory):
         #     G = 0
         #     discount = 1
         #     for reward in self.reward_memory[idx:]:
-        #         G += discount*reward
+        #         G += discount * reward
         #         discount *= self.gamma
         #     log_prob = self.probs_memory[idx]
         #     # need "-" sign because we are computing gradient ASCENT, pytorch functions computer descent normally (with +).
-        #     loss += -G * log_prob
-
-        # G = np.zeros_like(self.reward_memory)
-        # for idx in range(len(self.reward_memory)):
-        #     G_sum = 0
-        #     discount = 1
-        #     for reward in self.reward_memory[idx:]:
-        #         G_sum += discount*reward
-        #         discount *= self.gamma
-        #     G[idx] = G_sum
-
-        G = np.zeros_like(self.reward_memory, dtype=np.float64)
-        for t in range(len(self.reward_memory)):
-            G_sum = 0
-            discount = 1
-            for k in range(t, len(self.reward_memory)):
-                G_sum += self.reward_memory[k] * discount
-                discount *= self.gamma
-            G[t] = G_sum
-        G = torch.tensor(G, dtype=torch.float).to(self.policy.device)
+        #     loss.append(-G * log_prob)
+        # print(loss)
+        # loss = torch.cat(loss).sum()  # another method for computing loss
 
         loss = 0
-        for g, logprob in zip(G, self.probs_memory):
-            print(g)
-            print(logprob)
-            print(loss)
-            loss += -g * logprob
+        # compute return
+        # G_t = R_t+1 + gamma*R_t+2 + gamma**2*R_t+3 ...
+        for idx, _ in enumerate(self.reward_memory):
+            G = 0
+            discount = 1
+            for reward in self.reward_memory[idx:]:
+                G += discount*reward
+                discount *= self.gamma
+            log_prob = self.probs_memory[idx]
+            # need "-" sign because we are computing gradient ASCENT, pytorch functions computer descent normally (with +).
+            loss += -G * log_prob
 
-        # loss = torch.Tensor(loss).to(self.policy.device)
-        loss.backward()
+        loss: torch.Tensor
+        loss.backward()  # it is not an int
         self.policy.optimizer.step()
 
         self.probs_memory = []
