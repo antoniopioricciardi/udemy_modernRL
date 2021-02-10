@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 
 class PGN(nn.Module):
-    def __init__(self, state_space, n_actions, lr):
+    def __init__(self, state_space, n_actions, lr, checkpoint_file):
         super(PGN, self).__init__()
 
         self.input_layer = nn.Linear(*state_space, 128)  # * means we are going to unpack a list
@@ -17,11 +17,21 @@ class PGN(nn.Module):
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.to(self.device)
 
+        self.checkpoint_file = checkpoint_file
+
     def forward(self, state):
         x = F.relu(self.input_layer(state))
         x = F.relu(self.hid_layer(x))
         x = self.output_layer(x)
         return x
+
+    def save_checkpoint(self):
+        print('.........Saving checkpoint.........')
+        torch.save(self.state_dict(), self.checkpoint_file)
+
+    def load_checkpoint(self):
+        print('.........Loading checkpoint.........')
+        self.load_state_dict(torch.load(self.checkpoint_file))
 
 
 

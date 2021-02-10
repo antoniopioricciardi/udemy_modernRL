@@ -7,17 +7,22 @@ from torch.autograd import Variable
 from policy_gradient_network import PGN
 
 class Agent():
-    def __init__(self, state_space, lr, gamma=0.99, n_actions=4):
+    def __init__(self, load_checkpoint, checkpoint_file, state_space, lr, gamma=0.99, n_actions=4):
+        self.load_checkpoint = load_checkpoint
         self.state_space = state_space
         self.lr = lr
         self.gamma = gamma
         self.n_actions = n_actions
 
-        self.policy = PGN(self.state_space, self.n_actions, self.lr)
+        self.policy = PGN(self.state_space, self.n_actions, self.lr, checkpoint_file)
 
         # keep track of memory rewards per episode and agent's memory of log probs of the actions it took
         self.reward_memory = []
         self.probs_memory = []
+
+        if self.load_checkpoint:
+            self.policy.load_checkpoint()
+            self.policy.eval()
 
     def choose_action(self, observation):
         """
@@ -79,3 +84,5 @@ class Agent():
         self.probs_memory = []
         self.reward_memory = []
 
+    def save_model(self):
+        self.policy.save_checkpoint()

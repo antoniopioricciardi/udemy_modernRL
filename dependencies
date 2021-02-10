@@ -1,0 +1,5 @@
+pip install gym
+pip install numpy
+pip install matplotlib==3.3.4
+pip install torch==1.7.8
+pip install box2d-py==2.3.8
