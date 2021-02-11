@@ -30,17 +30,19 @@ if __name__ == '__main__':
     if not os.path.exists('models') and not load_checkpoint:
         os.mkdir('models')
 
-    lr = 5*10e-6
+    lr = 5e-6
     gamma = 0.99
-    n_games = 3000
+    n_games = 2000
     fname = 'ACTORCRITIC_lunarlander_lr' + str(lr) + '_gamma' + str(gamma) + '_ngames' + str(n_games)
     checkpoint_file = 'models/' + fname
-    figure_file = 'plots' + fname + '.png'
+    figure_file = 'plots/' + fname + '.png'
 
     env = gym.make('LunarLander-v2')
+    n_hid_1 = 2048
+    n_hid_2 = 1536
     n_states = 8
     n_actions = 4
-    agent = Agent(load_checkpoint, checkpoint_file, n_states, n_actions, lr, gamma)
+    agent = Agent(load_checkpoint, checkpoint_file, n_states, n_actions, n_hid_1, n_hid_2, lr, gamma)
 
     if not load_checkpoint:
         n_to_consider = 100
@@ -53,7 +55,7 @@ if __name__ == '__main__':
             while not done:
                 action, action_log_prob, value_est = agent.choose_action(obs)
                 obs_, reward, done, info = env.step(action)
-                agent.learn(obs, action_log_prob, reward, obs_, value_est)
+                agent.learn(obs, action_log_prob, reward, obs_, value_est, done)
                 obs = obs_
 
                 score += reward

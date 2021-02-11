@@ -5,13 +5,13 @@ import torch.nn.functional as F
 
 
 class ActorCriticNet(nn.Module):
-    def __init__(self, n_states, n_actions, lr, checkpoint_file):
+    def __init__(self, n_states, n_actions, n_hid_1, n_hid_2, lr, checkpoint_file):
         super(ActorCriticNet, self).__init__()
 
-        self.fc1 = nn.Linear(n_states, 2048)
-        self.fc2 = nn.Linear(2048, 1024)
-        self.fc_actor = nn.Linear(1024, n_actions)
-        self.fc_critic = nn.Linear(1024, 1)
+        self.fc1 = nn.Linear(n_states, n_hid_1)
+        self.fc2 = nn.Linear(n_hid_1, n_hid_2)
+        self.fc_actor = nn.Linear(n_hid_2, n_actions)
+        self.fc_critic = nn.Linear(n_hid_2, 1)
 
         # maybe declare actor and critic losses
         self.optimizer = optim.Adam(self.parameters(), lr=lr)

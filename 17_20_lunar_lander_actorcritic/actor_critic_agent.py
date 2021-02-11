@@ -2,8 +2,8 @@ import torch
 from actor_critic_network import ActorCriticNet
 
 class Agent():
-    def __init__(self, load_checkpoint, checkpoint_file, state_space, n_actions=4, lr=0.0001, gamma=0.99):
-        self.ac_net = ActorCriticNet(state_space, n_actions, lr, checkpoint_file)
+    def __init__(self, load_checkpoint, checkpoint_file, state_space, n_hid_1=256, n_hid_2=256, n_actions=4, lr=0.0001, gamma=0.99):
+        self.ac_net = ActorCriticNet(state_space, n_actions, n_hid_1, n_hid_2, lr, checkpoint_file)
         self.gamma = gamma
 
         if load_checkpoint:
@@ -22,17 +22,21 @@ class Agent():
 
         return action.item(), action_log_prob, value_est
 
-    def learn(self, state, action_log_prob, reward, state_, value_s):
+    def learn(self, state, action_log_prob, reward, state_, value_s, done):
         self.ac_net.optimizer.zero_grad()
+        reward = torch.tensor([reward]).to(self.ac_net.device)
         state_ = torch.tensor([state_]).to(self.ac_net.device)
         _, value_s_ = self.ac_net(state_)
-        delta = reward + self.gamma * value_s_ - value_s
 
-        actor_loss = - delta * action_log_prob
-        critic_loss = torch.square(delta)
+        delta = reward + self.gamma * value_s_*(1-int(done)) - value_s
 
-        actor_loss.backward(retain_graph=True)
-        critic_loss.backward()
+        actor_loss = -delta * action_log_prob
+        critic_loss = delta**2
+
+        (actor_loss + critic_loss).backward()
+        # actor_loss.backward(retain_graph=True)
+        # critic_loss.backward()
+        self.ac_net.optimizer.step()
 
     def save_model(self):
         self.ac_net.save_checkpoint()
