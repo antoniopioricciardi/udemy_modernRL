@@ -35,7 +35,7 @@ if __name__ == '__main__':
     n_games = 3000
     fname = 'ACTORCRITIC_lunarlander_lr' + str(lr) + '_gamma' + str(gamma) + '_ngames' + str(n_games)
     checkpoint_file = 'models/' + fname
-    figure_file = 'plots' + fname
+    figure_file = 'plots' + fname + '.png'
 
     env = gym.make('LunarLander-v2')
     n_states = 8
