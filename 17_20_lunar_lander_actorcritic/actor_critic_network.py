@@ -15,7 +15,7 @@ class ActorCriticNet(nn.Module):
 
         # maybe declare actor and critic losses
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
-        self.device = ('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.to(self.device)
 
         self.checkpoint_file = checkpoint_file

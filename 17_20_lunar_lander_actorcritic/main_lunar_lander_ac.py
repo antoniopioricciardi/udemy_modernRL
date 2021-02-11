@@ -21,7 +21,7 @@ def plot_scores(scores, n_to_consider, figure_file):
 
 
 if __name__ == '__main__':
-    load_checkpoint = False
+    load_checkpoint = True
 
     if not os.path.exists('plots'):
         os.mkdir('plots')
@@ -61,15 +61,15 @@ if __name__ == '__main__':
                 score += reward
             scores.append(score)
 
-            if i > 0 and i % n_to_consider == 0:
-                avg_score = np.mean(scores[-n_to_consider:])
-                print('Epoch %d, 100 games avg: %.3f' % (i, avg_score))
-                if avg_score > prev_score:
-                    prev_score = avg_score
-                    agent.save_model()
+            # if i > 0 and i % n_to_consider == 0:
+            avg_score = np.mean(scores[-n_to_consider:])
+            print('Epoch %d, score %.3f - 100 games avg: %.3f' % (i, score, avg_score))
+            if avg_score > prev_score:
+                prev_score = avg_score
+                agent.save_model()
 
         avg_score = np.mean(scores[-n_to_consider:])
-        print('Epoch %d, 100 games avg: %.3f' % (n_games, avg_score))
+        print('%d games avg: %.3f' % (n_to_consider, avg_score))
         if avg_score > prev_score:
             prev_score = avg_score
             agent.save_model()
@@ -94,9 +94,9 @@ if __name__ == '__main__':
                 score += reward
             scores.append(score)
 
-            if i > 0 and i % n_to_consider == 0:
-                avg_score = np.mean(scores[-n_to_consider:])
-                print('Epoch %d, 100 games avg: %.3f' % (i, avg_score))
+            # if i > 0 and i % n_to_consider == 0:
+            avg_score = np.mean(scores[-n_to_consider:])
+            print('Epoch %d, score %.3f - 100 games avg: %.3f' % (i, score, avg_score))
                 # save_check 'models/' + fname
 
         avg_score = np.mean(scores[-n_to_consider:])
