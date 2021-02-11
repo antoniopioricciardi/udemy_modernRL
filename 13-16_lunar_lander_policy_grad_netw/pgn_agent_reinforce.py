@@ -15,7 +15,6 @@ class Agent():
         self.n_actions = n_actions
 
         self.policy = PGN(self.state_space, self.n_actions, self.lr, checkpoint_file)
-
         # keep track of memory rewards per episode and agent's memory of log probs of the actions it took
         self.reward_memory = []
         self.probs_memory = []

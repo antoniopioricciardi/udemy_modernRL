@@ -13,7 +13,6 @@ class PGN(nn.Module):
         self.output_layer = nn.Linear(128, n_actions)
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
-        # self.loss = nn.MSELoss()
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.to(self.device)
 
@@ -31,7 +30,10 @@ class PGN(nn.Module):
 
     def load_checkpoint(self):
         print('.........Loading checkpoint.........')
-        self.load_state_dict(torch.load(self.checkpoint_file))
+        if self.device.type == 'cpu':
+            self.load_state_dict(torch.load(self.checkpoint_file, map_location=torch.device('cpu')))
+        else:
+            self.load_state_dict(torch.load(self.checkpoint_file))
 
 
 
