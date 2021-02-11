@@ -2,8 +2,8 @@ import torch
 from actor_critic_network import ActorCriticNet
 
 class Agent():
-    def __init__(self, load_checkpoint, checkpoint_file, state_space, n_hid_1=256, n_hid_2=256, n_actions=4, lr=0.0001, gamma=0.99):
-        self.ac_net = ActorCriticNet(state_space, n_actions, n_hid_1, n_hid_2, lr, checkpoint_file)
+    def __init__(self, load_checkpoint, checkpoint_file, n_states,  n_actions=4, n_hid_1=256, n_hid_2=256, lr=0.0001, gamma=0.99):
+        self.ac_net = ActorCriticNet(n_states, n_actions, n_hid_1, n_hid_2, lr, checkpoint_file)
         self.gamma = gamma
 
         if load_checkpoint:
