@@ -9,8 +9,7 @@ class ActorNet(nn.Module):
         super(ActorNet, self).__init__()
 
         self.fc1 = nn.Linear(n_states, n_hid_1)
-        self.fc2 = nn.Linear(n_hid_1, n_hid_2)
-        self.fc_actor = nn.Linear(n_hid_2, n_actions)
+        self.fc_actor = nn.Linear(n_hid_1, n_actions)
 
         # maybe declare actor and critic losses
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
@@ -21,7 +20,6 @@ class ActorNet(nn.Module):
 
     def forward(self, state):
         x = F.relu(self.fc1(state))
-        x = F.relu(self.fc2(x))
         action_scores = self.fc_actor(x)
         return action_scores
 
@@ -38,12 +36,11 @@ class ActorNet(nn.Module):
 
 
 class CriticNet(nn.Module):
-    def __init__(self, n_states, n_hid_1, n_hid_2, lr, checkpoint_file):
+    def __init__(self, n_states, n_hid_1, lr, checkpoint_file):
         super(CriticNet, self).__init__()
 
         self.fc1 = nn.Linear(n_states, n_hid_1)
-        self.fc2 = nn.Linear(n_hid_1, n_hid_2)
-        self.fc_critic = nn.Linear(n_hid_2, 1)
+        self.fc_critic = nn.Linear(n_hid_1, 1)
 
         # maybe declare actor and critic losses
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
@@ -54,7 +51,6 @@ class CriticNet(nn.Module):
 
     def forward(self, state):
         x = F.relu(self.fc1(state))
-        x = F.relu(self.fc2(x))
         value_est = self.fc_critic(x)
         return value_est
 

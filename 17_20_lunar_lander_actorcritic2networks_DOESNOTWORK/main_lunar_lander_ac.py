@@ -21,7 +21,7 @@ def plot_scores(scores, n_to_consider, figure_file):
 
 
 if __name__ == '__main__':
-    load_checkpoint = True
+    load_checkpoint = False
 
     if not os.path.exists('plots'):
         os.mkdir('plots')
@@ -31,6 +31,7 @@ if __name__ == '__main__':
         os.mkdir('models')
 
     lr = 5e-6
+    lrcrit = 5e-4
     gamma = 0.99
     n_games = 2000
     fname = 'ACTORCRITIC_lunarlander_lr' + str(lr) + '_gamma' + str(gamma) + '_ngames' + str(n_games)
@@ -38,11 +39,11 @@ if __name__ == '__main__':
     figure_file = 'plots/' + fname + '.png'
 
     env = gym.make('LunarLander-v2')
-    n_hid_1 = 2048
-    n_hid_2 = 1536
+    n_hid_1 = 1024
+    n_hid_2 = 512
     n_states = 8
     n_actions = 4
-    agent = Agent(load_checkpoint, checkpoint_file, n_states, n_actions, n_hid_1, n_hid_2, lr, gamma)
+    agent = Agent(load_checkpoint, checkpoint_file, n_states, n_actions, n_hid_1, n_hid_2, lrcrit, gamma)
 
     if not load_checkpoint:
         n_to_consider = 100
