@@ -21,7 +21,7 @@ def plot_scores(scores, n_to_consider, figure_file):
 
 
 if __name__ == '__main__':
-    load_checkpoint = True
+    load_checkpoint = False
 
     if not os.path.exists('plots'):
         os.mkdir('plots')
