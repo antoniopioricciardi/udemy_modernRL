@@ -8,7 +8,7 @@ from ou_action_noise import OUActionNoise
 
 
 class DDPGAgent():
-    def __init__(self, n_states, n_actions, checkpoint_file, mem_size=10**6, batch_size=64, n_hid1=400, n_hid2=300,
+    def __init__(self, load_checkpoint, n_states, n_actions, checkpoint_file, mem_size=10**6, batch_size=64, n_hid1=400, n_hid2=300,
                  alpha=1e-4, beta=1e-3, gamma=0.99, tau=0.99):
         self.batch_size = batch_size
         self.gamma = gamma
@@ -22,7 +22,10 @@ class DDPGAgent():
 
         self.noise = OUActionNoise(mu=np.zeros(n_actions))
         self.memory = ReplayMemory(mem_size, n_states, n_actions)
-        self.update_network_parameters(tau=1)
+        self.update_network_parameters_phil(tau=1)
+        if load_checkpoint:
+            self.actor.eval()
+        self.load_checkpoint = load_checkpoint
 
     def reset_noise(self):
         self.noise.reset()
@@ -60,8 +63,10 @@ class DDPGAgent():
         # compute actions
         mu = self.actor(obs)
         # add some random noise for exploration
-        mu_prime = mu + torch.tensor(self.noise(), dtype=torch.float).to(self.actor.device)
-        self.actor.train()
+        mu_prime = mu
+        if not self.load_checkpoint:
+            mu_prime = mu + torch.tensor(self.noise(), dtype=torch.float).to(self.actor.device)
+            self.actor.train()
         return mu_prime.cpu().detach().numpy()
 
     def store_transitions(self, obs, action, reward, obs_, done):
@@ -125,7 +130,7 @@ class DDPGAgent():
         self.actor.optimizer.step()
         self.critic.optimizer.step()
 
-        self.update_network_parameters()
+        self.update_network_parameters_phil()
 
 
     def __copy_params_phil(self, net_a, net_b, tau):
@@ -142,7 +147,7 @@ class DDPGAgent():
             tau = self.tau
 
         updated_actor_state_dict = self.__copy_params_phil(self.actor, self.actor_target, tau)
-        updated_critir_state_dict = self.__copy_params_phil(self.critic, self.critic_target, tau)
+        updated_critic_state_dict = self.__copy_params_phil(self.critic, self.critic_target, tau)
 
         self.actor_target.load_state_dict(updated_actor_state_dict)
-        self.critic_target.load_state_dict(updated_critir_state_dict)
+        self.critic_target.load_state_dict(updated_critic_state_dict)

@@ -23,7 +23,7 @@ def plot_scores(scores, n_to_consider, figure_file):
 
 if __name__ == '__main__':
     np.random.seed(0)  # helps with stability
-    load_checkpoint = False
+    load_checkpoint = True
     paths = ['plots', 'videos', 'models']
     for path_name in paths:
         if not os.path.exists(path_name):
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     figure_file = 'plots/' + fname + '.png'
     checkpoint_file = 'models/' + fname
 
-    agent = DDPGAgent(n_states, n_actions, checkpoint_file, mem_size, batch_size, n_hid1, n_hid2, lr_alpha, lr_beta,
+    agent = DDPGAgent(load_checkpoint, n_states, n_actions, checkpoint_file, mem_size, batch_size, n_hid1, n_hid2, lr_alpha, lr_beta,
                       gamma, tau)
 
     env = gym.make('LunarLanderContinuous-v2')
@@ -71,8 +71,8 @@ if __name__ == '__main__':
             scores.append(score)
 
             avg_score = np.mean(scores[-n_to_consider:])
-            if avg_score > best_score:
-                best_score = avg_score
+            if score > best_score:
+                best_score = score
                 agent.save_models()
             #if i > 0 and i % n_to_consider == 0:
             print('Epoch %d, score %.3f - %d games avg: %.3f' % (i, score, n_to_consider, avg_score))
@@ -80,8 +80,8 @@ if __name__ == '__main__':
 
         avg_score = np.mean(scores[-n_to_consider:])
         print('Epoch %d, score %.3f - %d games avg: %.3f' % (n_games, score,n_to_consider, avg_score))
-        if avg_score > best_score:
-            best_score = avg_score
+        if score > best_score:
+            best_score = score
             agent.save_models()
 
         plot_scores(scores, n_to_consider, figure_file)
