@@ -1,6 +1,7 @@
 import torch
 from actor_critic_network import ActorCriticNet
 
+
 class Agent():
     def __init__(self, load_checkpoint, checkpoint_file, n_states,  n_actions=4, n_hid_1=256, n_hid_2=256, lr=0.0001, gamma=0.99):
         self.ac_net = ActorCriticNet(n_states, n_actions, n_hid_1, n_hid_2, lr, checkpoint_file)
@@ -28,6 +29,7 @@ class Agent():
         state_ = torch.tensor([state_]).to(self.ac_net.device)
         _, value_s_ = self.ac_net(state_)
 
+        # 1-int(done) is for V_terminal = 0, meaning that we zero out states where done==True
         delta = reward + self.gamma * value_s_*(1-int(done)) - value_s
 
         actor_loss = -delta * action_log_prob
