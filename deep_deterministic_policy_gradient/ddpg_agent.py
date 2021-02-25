@@ -30,14 +30,14 @@ class DDPGAgent():
     def reset_noise(self):
         self.noise.reset()
 
-    def __copy_param(self, net_param_1, net_param_2):
+    def __copy_param(self, net_param_1, net_param_2, tau):
         # a.copy_(b) reads content from b and copy it to a
         for par, target_par in zip(net_param_1, net_param_2):
             with torch.no_grad():
-                val_to_copy = self.tau * par.weight + (1 - self.tau) * target_par.weight
+                val_to_copy = tau * par.weight + (1 - tau) * target_par.weight
                 target_par.weight.copy_(val_to_copy)
                 if target_par.bias is not None:
-                    val_to_copy = self.tau * par.bias + (1 - self.tau) * target_par.bias
+                    val_to_copy = tau * par.bias + (1 - tau) * target_par.bias
                     target_par.bias.copy_(val_to_copy)
 
     def update_network_parameters(self, tau=None):
@@ -49,11 +49,11 @@ class DDPGAgent():
 
         actor_params = self.actor.children()
         actor_target_params = self.actor_target.children()
-        self.__copy_param(actor_params, actor_target_params)
+        self.__copy_param(actor_params, actor_target_params, tau)
 
         critic_params = self.critic.children()
         critic_target_params = self.critic_target.children()
-        self.__copy_param(critic_params, critic_target_params)
+        self.__copy_param(critic_params, critic_target_params, tau)
 
     def choose_action(self, obs):
         # when using layer norm, we do not want to calculate statistics for the forward propagation. Not needed

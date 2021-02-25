@@ -1,6 +1,5 @@
 import os
 import gym
-import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from gym import wrappers
@@ -79,7 +78,7 @@ if __name__ == '__main__':
 
 
         avg_score = np.mean(scores[-n_to_consider:])
-        print('Epoch %d, score %.3f - %d games avg: %.3f' % (n_games, score,n_to_consider, avg_score))
+        print('Epoch %d, best score %.3f - %d games avg: %.3f' % (n_games, best_score, n_to_consider, avg_score))
         if score > best_score:
             best_score = score
             agent.save_models()
