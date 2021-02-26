@@ -16,14 +16,15 @@ class TD3CriticNetwork(nn.Module):
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
-        self.device = ('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.to(self.device)
 
         self.checkpoint_file = checkpoint_file + name
 
     def forward(self, state, action):
+
         # as specified in the TD3 paper, we concatenate inputs
-        x = torch.cat((state, action), -1)
+        x = torch.cat((state, action), -1).float()
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
@@ -51,7 +52,7 @@ class TD3ActorNetwork(nn.Module):
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
-        self.device = ('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.to(self.device)
 
         self.checkpoint_file = checkpoint_file + name

@@ -19,14 +19,21 @@ def plot_scores(scores, n_episodes_to_consider, figure_file):
     plt.title('Average of the previous %d scores' %(n_episodes_to_consider))
     plt.savefig(figure_file)
 
-env_name = 'LunarLanderContinuous-v2'
-# env_name = 'BipedalWalker-v3'
+
+# seed = (0)
+# env.seed(0)
+# np.random.seed(0)
+# random.seed(0)
+# torch.manual_seed(0)
+
+#env_name = 'LunarLanderContinuous-v2'
+env_name = 'BipedalWalker-v3'
 env = gym.make(env_name)
 
 n_games = 1500
 n_episodes_to_consider = 100
 
-load_checkpoint = False
+load_checkpoint = True
 
 n_states = env.observation_space.shape[0]
 n_actions = env.action_space.shape[0]
@@ -52,6 +59,8 @@ figure_file = env_name + '/plots/' + fname + '.png'
 checkpoint_file = env_name + '/models/' + fname
 agent = Agent(load_checkpoint, checkpoint_file, env, n_states, n_actions, update_actor_interval, warmup, mem_size, batch_size,
               n_hid1, n_hid2, lr_alpha, lr_beta, gamma, tau, noise_mean, noise_sigma)
+if load_checkpoint:
+    agent.load_models()
 if __name__=='__main__':
     if not os.path.exists(env_name):
         os.mkdir(env_name)
@@ -82,7 +91,9 @@ if __name__=='__main__':
             else:
                 action = agent.choose_action(obs)
             obs_, reward, done, info = env.step(action)
-            agent.learn()
+            if not load_checkpoint:
+                agent.store_transition(obs, action, reward, obs_, done)
+                agent.learn()
             obs = obs_
             score += reward
         scores.append(score)

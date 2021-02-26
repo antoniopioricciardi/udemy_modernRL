@@ -14,8 +14,8 @@ class Agent():
         self.checkpoint_file = checkpoint_file
         # needed for clamping in the learn function
         self.env = env
-        self.max_action = env.action_space.high[0]
-        self.low_action = env.action_space.low[0]
+        self.max_action = float(env.action_space.high[0])
+        self.low_action = float(env.action_space.low[0])
 
         self.n_actions = n_actions
         # to keep track of how often we call "learn" function, for the actor network
@@ -55,7 +55,7 @@ class Agent():
             action = self.actor(obs)
 
             # exploratory noise, scaled wrt action scale (max_action)
-            noise = torch.tensor(np.random.normal(self.noise_mean, self.noise_sigma * self.max_action, size=self.n_actions))
+            noise = torch.tensor(np.random.normal(self.noise_mean, self.noise_sigma * self.max_action, size=self.n_actions)).to(self.actor.device)
             action += noise
         action = torch.clamp(action, self.low_action, self.max_action)
         return action.cpu().detach().numpy()
@@ -67,7 +67,7 @@ class Agent():
         return action.cpu().detach().numpy()
 
     def store_transition(self, obs, action, reward, obs_, done):
-        self.memory.store_transition((obs, action, reward, obs_, done))
+        self.memory.store_transition(obs, action, reward, obs_, done)
 
     def sample_transitions(self):
         state_batch, action_batch, reward_batch, new_state_batch, done_batch = self.memory.sample_buffer(
@@ -121,7 +121,7 @@ class Agent():
             return
         state_batch, action_batch, reward_batch, new_state_batch, done_batch = self.sample_transitions()
         # +- 0.5 as per paper. To be tested if min and max actions are not equal (e.g. -2 and 1)
-        noise = np.clip(np.random.normal(self.noise_mean, 0.2, size=self.n_actions), -0.5, 0.5)
+        noise = torch.tensor(np.clip(np.random.normal(self.noise_mean, 0.2, size=self.n_actions), -0.5, 0.5)).to(self.actor.device)
         target_next_action = torch.clamp(self.target_actor(new_state_batch) + noise, self.low_action, self.max_action)
 
         target_q1_ = self.target_critic_1(new_state_batch, target_next_action)
@@ -149,7 +149,7 @@ class Agent():
         self.critic_2.optimizer.step()
 
         if self.learn_step_counter % self.update_actor_interval:
-            action = self.actor(action_batch)
+            action = self.actor(state_batch)
             # compute actor loss proportional to the estimated value from q1 given state, action pairs, where the action
             # is recomputed using the new policy
             actor_loss = -torch.mean(self.critic_1(state_batch, action))

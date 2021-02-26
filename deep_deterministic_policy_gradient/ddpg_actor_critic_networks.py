@@ -38,7 +38,7 @@ class CriticNetwork(nn.Module):
         nn.init.uniform_(self.q.bias, -f3, f3)
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=1e-2)
-        self.device = ('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.to(self.device)
 
     def forward(self, state, action):
@@ -86,7 +86,7 @@ class ActorNetwork(nn.Module):
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)  #1e-4)
 
-        self.device = ('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.to(self.device)
 
     def forward(self, state):
