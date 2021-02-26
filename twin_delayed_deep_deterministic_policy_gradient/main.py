@@ -1,5 +1,6 @@
 import os
 import gym
+import pybullet_envs  # register PyBullet enviroments with open ai gym
 import numpy as np
 import matplotlib.pyplot as plt
 from agent import Agent
@@ -27,11 +28,12 @@ def plot_scores(scores, n_episodes_to_consider, figure_file):
 # torch.manual_seed(0)
 
 #env_name = 'LunarLanderContinuous-v2'
-env_name = 'BipedalWalker-v3'
+# env_name = 'BipedalWalker-v3'
+env_name = 'HalfCheetahBulletEnv-v0'
 env = gym.make(env_name)
 
-n_games = 1500
-n_episodes_to_consider = 100
+n_games = 3000
+n_episodes_to_consider = 50
 
 load_checkpoint = True
 
@@ -104,6 +106,8 @@ if __name__=='__main__':
             agent.save_models()
         # if i > 0 and i % n_to_consider == 0:
         print('Epoch %d, score %.3f - %d games avg: %.3f' % (i, score, n_episodes_to_consider, avg_score))
+        if i > 0 and i % 200 == 0:
+            plot_scores(scores, n_episodes_to_consider, figure_file)
 
     plot_scores(scores, n_episodes_to_consider, figure_file)
 
