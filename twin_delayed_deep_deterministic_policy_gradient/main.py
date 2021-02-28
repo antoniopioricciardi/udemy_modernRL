@@ -31,8 +31,8 @@ def plot_scores(scores, n_episodes_to_consider, figure_file):
 # env_name = 'BipedalWalker-v3'
 # env_name = 'HalfCheetahBulletEnv-v0'
 # env_name = 'HumanoidBulletEnv-v0'
-env_name = 'HopperBulletEnv-v0'
-#env_name = 'Walker2DBulletEnv-v0'
+# env_name = 'HopperBulletEnv-v0'
+env_name = 'Walker2DBulletEnv-v0'
 env = gym.make(env_name)
 
 n_games = 10000
@@ -110,10 +110,14 @@ if __name__=='__main__':
             best_score = score
             agent.save_models()
         # if i > 0 and i % n_to_consider == 0:
-        if i % 100 == 0:
-            print('Epoch %d, %d timesteps, score %.3f - best score %.3f -- %d games avg: %.3f' % (i, timesteps_count, score, best_score, n_episodes_to_consider, avg_score))
-        if i > 0 and i % 200 == 0:
-            plot_scores(scores, n_episodes_to_consider, figure_file)
+        if not load_checkpoint:
+            if i % 100 == 0:
+                print('Epoch %d, %d timesteps, score %.3f - best score %.3f -- %d games avg: %.3f' % (i, timesteps_count, score, best_score, n_episodes_to_consider, avg_score))
+            if i > 0 and i % 200 == 0:
+                plot_scores(scores, n_episodes_to_consider, figure_file)
+        else:
+            print('Epoch %d, %d timesteps, score %.3f - best score %.3f -- %d games avg: %.3f' % (
+            i, timesteps_count, score, best_score, n_episodes_to_consider, avg_score))
 
     plot_scores(scores, n_episodes_to_consider, figure_file)
 
