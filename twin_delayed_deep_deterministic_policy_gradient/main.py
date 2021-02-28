@@ -29,10 +29,13 @@ def plot_scores(scores, n_episodes_to_consider, figure_file):
 
 #env_name = 'LunarLanderContinuous-v2'
 # env_name = 'BipedalWalker-v3'
-env_name = 'HalfCheetahBulletEnv-v0'
+# env_name = 'HalfCheetahBulletEnv-v0'
+# env_name = 'HumanoidBulletEnv-v0'
+env_name = 'HopperBulletEnv-v0'
+#env_name = 'Walker2DBulletEnv-v0'
 env = gym.make(env_name)
 
-n_games = 3000
+n_games = 10000
 n_episodes_to_consider = 50
 
 load_checkpoint = True
@@ -83,11 +86,13 @@ if __name__=='__main__':
     assert n_games >= n_episodes_to_consider
     scores = []
     best_score = env.reward_range[0]  # 0 is the lowest reward
+    timesteps_count = 0
     for i in range(n_games):
         obs = env.reset()
         done = False
         score = 0
         while not done:
+            timesteps_count += 1
             if load_checkpoint:
                 action = agent.choose_action_eval(obs)
             else:
@@ -105,7 +110,8 @@ if __name__=='__main__':
             best_score = score
             agent.save_models()
         # if i > 0 and i % n_to_consider == 0:
-        print('Epoch %d, score %.3f - %d games avg: %.3f' % (i, score, n_episodes_to_consider, avg_score))
+        if i % 100 == 0:
+            print('Epoch %d, %d timesteps, score %.3f - best score %.3f -- %d games avg: %.3f' % (i, timesteps_count, score, best_score, n_episodes_to_consider, avg_score))
         if i > 0 and i % 200 == 0:
             plot_scores(scores, n_episodes_to_consider, figure_file)
 
