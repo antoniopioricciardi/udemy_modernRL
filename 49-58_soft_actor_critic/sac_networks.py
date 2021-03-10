@@ -17,7 +17,7 @@ class ValueNetwork(nn.Module):
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+        self.to(self.device)
         self.checkpoint_file = checkpoint_file + name
 
     def forward(self, state):
@@ -48,7 +48,7 @@ class CriticNetwork(nn.Module):
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+        self.to(self.device)
         self.checkpoint_file = checkpoint_file + name
 
     def forward(self, state, action):
@@ -72,7 +72,7 @@ class ActorNetwork(nn.Module):
     def __init__(self, n_states, n_actions, n_hid1, n_hid2, max_action, lr, checkpoint_file, name):
         super(ActorNetwork, self).__init__()
 
-        self.reparam_noise = 1e-6 # noise parameter for the reparametrization trick
+        self.reparam_noise = 1e-6  # noise parameter for the reparametrization trick
 
         self.max_action = max_action
         self.fc1 = nn.Linear(n_states, n_hid1)
@@ -83,7 +83,7 @@ class ActorNetwork(nn.Module):
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+        self.to(self.device)
         self.checkpoint_file = checkpoint_file + name
 
     def forward(self, state):
@@ -98,7 +98,7 @@ class ActorNetwork(nn.Module):
     def sample_normal(self, state, reparametrize=True):
         # for the deterministic policy test just return mu instead of action
         mu, sigma = self.forward(state)  # get mu and sigma for the state
-        probabilities = Normal(mu, sigma)  # get distribution
+        probabilities = torch.distributions.Normal(mu, sigma)  # get distribution
         if reparametrize:
             actions = probabilities.rsample()
         else:

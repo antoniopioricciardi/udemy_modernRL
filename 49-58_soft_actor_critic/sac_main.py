@@ -31,15 +31,15 @@ def plot_scores(scores, n_episodes_to_consider, figure_file):
 # env_name = 'BipedalWalker-v3'
 # env_name = 'HalfCheetahBulletEnv-v0'
 # env_name = 'HumanoidBulletEnv-v0'
-# env_name = 'HopperBulletEnv-v0'
+env_name = 'HopperBulletEnv-v0'
 # env_name = 'Walker2DBulletEnv-v0'
-env_name = 'InvertedPendulumBulletEnv-v0'
+# env_name = 'InvertedPendulumBulletEnv-v0'
 env = gym.make(env_name)
 
 n_games = 250
 n_episodes_to_consider = 50
 
-load_checkpoint = True
+load_checkpoint = False
 
 n_states = env.observation_space.shape[0]
 n_actions = env.action_space.shape[0]
@@ -74,6 +74,7 @@ if __name__=='__main__':
             os.mkdir(path)
 
     if load_checkpoint:
+        # env.render(mode='human')
         env = wrappers.Monitor(env, env_name + '/videos', video_callable=lambda episode_id: True,
                                force=True)  #  force overwrites previous video
         figure_file = env_name + '/plots/' + fname + '_eval' + '.png'
@@ -91,26 +92,26 @@ if __name__=='__main__':
         score = 0
         while not done:
             timesteps_count += 1
-            if load_checkpoint:
-                action = agent.choose_action(obs)
-            else:
-                action = agent.choose_action(obs)
+            action = agent.choose_action(obs)
             obs_, reward, done, info = env.step(action)
             if not load_checkpoint:
                 agent.store_transition(obs, action, reward, obs_, done)
+                # agent.learn_phil()
                 agent.learn()
             obs = obs_
             score += reward
         scores.append(score)
 
         avg_score = np.mean(scores[-n_episodes_to_consider:])
-        if score > best_score and not load_checkpoint:
+        if score >= best_score:
+            print('saving models')
             best_score = score
-            agent.save_models()
+            if not load_checkpoint:
+                agent.save_models()
         # if i > 0 and i % n_to_consider == 0:
         if not load_checkpoint:
-            if i % 100 == 0:
-                print('Epoch %d, %d timesteps, score %.3f - best score %.3f -- %d games avg: %.3f' % (i, timesteps_count, score, best_score, n_episodes_to_consider, avg_score))
+            #if i % 100 == 0:
+            print('Epoch %d, %d timesteps, score %.3f - best score %.3f -- %d games avg: %.3f' % (i, timesteps_count, score, best_score, n_episodes_to_consider, avg_score))
             if i > 0 and i % 200 == 0:
                 plot_scores(scores, n_episodes_to_consider, figure_file)
         else:
