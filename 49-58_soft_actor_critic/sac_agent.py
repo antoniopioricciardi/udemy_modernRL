@@ -112,22 +112,22 @@ class Agent:
         critic_loss.backward()
         self.critic_1.optimizer.step()
         self.critic_2.optimizer.step()
-        self.update_network_parameters(self.value_net, self.target_value_net)
+        self.update_network_parameters(self.value_net, self.target_value_net, self.tau)
         # self.update_network_parameters_phil()
 
     def learn(self):
         if self.memory.mem_counter < self.batch_size:
             return
 
-        # state_batch, action_batch, reward_batch, new_state_batch, done_batch = self.sample_transitions()
-        state_batch, action_batch, reward_batch, new_state_batch, done_batch = \
-            self.memory.sample_buffer(self.batch_size)
-
-        reward_batch = torch.tensor(reward_batch, dtype=torch.float).to(self.critic_1.device)
-        done_batch = torch.tensor(done_batch).to(self.critic_1.device)
-        new_state_batch = torch.tensor(new_state_batch, dtype=torch.float).to(self.critic_1.device)
-        state_batch = torch.tensor(state_batch, dtype=torch.float).to(self.critic_1.device)
-        action_batch = torch.tensor(action_batch, dtype=torch.float).to(self.critic_1.device)
+        state_batch, action_batch, reward_batch, new_state_batch, done_batch = self.sample_transitions()
+        # state_batch, action_batch, reward_batch, new_state_batch, done_batch = \
+        #     self.memory.sample_buffer(self.batch_size)
+        #
+        # reward_batch = torch.tensor(reward_batch, dtype=torch.float).to(self.critic_1.device)
+        # done_batch = torch.tensor(done_batch).to(self.critic_1.device)
+        # new_state_batch = torch.tensor(new_state_batch, dtype=torch.float).to(self.critic_1.device)
+        # state_batch = torch.tensor(state_batch, dtype=torch.float).to(self.critic_1.device)
+        # action_batch = torch.tensor(action_batch, dtype=torch.float).to(self.critic_1.device)
 
         '''Compute Value Network loss'''
         self.value_net.optimizer.zero_grad()
@@ -143,7 +143,6 @@ class Agent:
         value_target = q - log_probs
         value_loss = 0.5 * F.mse_loss(val, value_target)
 
-        self.value_net.optimizer.zero_grad()
         value_loss.backward(retain_graph=True)
         self.value_net.optimizer.step()
         # val = val - q + log_prob
@@ -160,7 +159,6 @@ class Agent:
         actor_loss = log_probs - q
         actor_loss = torch.mean(actor_loss)
 
-        self.actor.optimizer.zero_grad()
         actor_loss.backward(retain_graph=True)
         self.actor.optimizer.step()
 

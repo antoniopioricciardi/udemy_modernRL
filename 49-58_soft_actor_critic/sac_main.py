@@ -31,9 +31,9 @@ def plot_scores(scores, n_episodes_to_consider, figure_file):
 # env_name = 'BipedalWalker-v3'
 # env_name = 'HalfCheetahBulletEnv-v0'
 # env_name = 'HumanoidBulletEnv-v0'
-env_name = 'HopperBulletEnv-v0'
+# env_name = 'HopperBulletEnv-v0'
 # env_name = 'Walker2DBulletEnv-v0'
-# env_name = 'InvertedPendulumBulletEnv-v0'
+env_name = 'InvertedPendulumBulletEnv-v0'
 env = gym.make(env_name)
 
 n_games = 250
