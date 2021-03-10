@@ -40,7 +40,7 @@ class Agent():
 
         self.memory = ReplayMemory(mem_size, n_states, n_actions)
 
-        # perform an exact copy of the networks to the respective targets
+        # tau=1 perform an exact copy of the networks to the respective targets
         # self.update_network_parameters(tau=1)
         self.update_network_parameters(self.actor, self.target_actor, tau=1)
         self.update_network_parameters(self.critic_1, self.target_critic_1, tau=1)
@@ -139,8 +139,8 @@ class Agent():
         critic_loss2 = F.mse_loss(q_val2, target)
         critic_loss = critic_loss1 + critic_loss2
 
-        self.critic_1.zero_grad()
-        self.critic_2.zero_grad()
+        self.critic_1.optimizer.zero_grad()
+        self.critic_2.optimizer.zero_grad()
         critic_loss.backward()
         #critic_loss1.backward()
         #critic_loss2.backward()
@@ -154,7 +154,7 @@ class Agent():
             # is recomputed using the new policy
             actor_loss = -torch.mean(self.critic_1(state_batch, action))
 
-            self.actor.zero_grad()
+            self.actor.optimizer.zero_grad()
             actor_loss.backward()
             self.actor.optimizer.step()
 

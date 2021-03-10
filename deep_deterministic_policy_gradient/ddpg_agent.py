@@ -110,8 +110,8 @@ class DDPGAgent():
         target = target.view(self.batch_size, 1)
 
         ''' zero out gradients '''
-        self.actor.zero_grad()
-        self.critic.zero_grad()
+        self.actor.optimizer.zero_grad()
+        self.critic.optimizer.zero_grad()
         ''' compute critic loss '''
         critic_value = self.critic(state_batch, action_batch)
         critic_loss = F.mse_loss(target, critic_value)
