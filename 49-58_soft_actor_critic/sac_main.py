@@ -32,14 +32,14 @@ def plot_scores(scores, n_episodes_to_consider, figure_file):
 # env_name = 'HalfCheetahBulletEnv-v0'
 # env_name = 'HumanoidBulletEnv-v0'
 # env_name = 'HopperBulletEnv-v0'
-# env_name = 'Walker2DBulletEnv-v0'
-env_name = 'InvertedPendulumBulletEnv-v0'
+env_name = 'Walker2DBulletEnv-v0'
+# env_name = 'InvertedPendulumBulletEnv-v0'
 env = gym.make(env_name)
 
-n_games = 250
+n_games = 10000
 n_episodes_to_consider = 50
 
-load_checkpoint = False
+load_checkpoint = True
 
 n_states = env.observation_space.shape[0]
 n_actions = env.action_space.shape[0]
@@ -104,9 +104,9 @@ if __name__=='__main__':
 
         avg_score = np.mean(scores[-n_episodes_to_consider:])
         if score >= best_score:
-            print('saving models')
             best_score = score
             if not load_checkpoint:
+                print('saving models')
                 agent.save_models()
         # if i > 0 and i % n_to_consider == 0:
         if not load_checkpoint:
